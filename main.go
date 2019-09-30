@@ -1,27 +1,44 @@
 package main
 
-import (
-	"fmt"
-)
+import "log"
 
 type Node struct {
 	name     string
 	children []*Node
 }
 
-// func addCategory(child, parent string) {
-// 	if len(parent) == 0 {
+var root = Node{
+	name: "root",
+}
 
-// 	}
-// }
+func addCategory(child, parent string) Node {
+	category := Node{
+		name: child,
+	}
+	if len(parent) == 0 {
+		root.children = append(root.children, &category)
+		return root
+	}
 
-func findByName(root *Node, id string) *Node {
+	for i, child := range root.children {
+		parentNode := findByName(child, parent)
+		if parentNode != nil && len(parentNode.children) == 0 {
+			parentNode.children = append(parentNode.children, &category)
+			root.children[i] = parentNode
+			break
+		}
+	}
+
+	return root
+}
+
+func findByName(parentNode *Node, name string) *Node {
 	queue := make([]*Node, 0)
-	queue = append(queue, root)
+	queue = append(queue, parentNode)
 	for len(queue) > 0 {
 		nextUp := queue[0]
 		queue = queue[1:]
-		if nextUp.name == id {
+		if nextUp.name == name {
 			return nextUp
 		}
 		if len(nextUp.children) > 0 {
@@ -34,30 +51,8 @@ func findByName(root *Node, id string) *Node {
 }
 
 func main() {
-	b := Node{
-		name: "b",
-	}
-	a := Node{
-		name:     "a",
-		children: []*Node{&b},
-	}
-	c := Node{
-		name: "c",
-	}
-	d := Node{
-		name: "d",
-	}
-	e := Node{
-		name: "e",
-	}
-	f := Node{
-		name: "f",
-	}
-	a.children = append(a.children, &c)
-	c.children = append(c.children, &d)
-	c.children = append(c.children, &e)
-	c.children = append(c.children, &f)
-	data := findByName(&a, "c")
-	fmt.Println(data)
-	fmt.Println(a, c)
+	root = addCategory("a", "")
+	root = addCategory("b", "")
+	root = addCategory("c", "b")
+	log.Println(root.children[1])
 }
