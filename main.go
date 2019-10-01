@@ -1,6 +1,9 @@
 package main
 
-import "log"
+import (
+	"errors"
+	"log"
+)
 
 type Node struct {
 	name     string
@@ -11,48 +14,103 @@ var root = Node{
 	name: "root",
 }
 
-func addCategory(child, parent string) Node {
+func addCategory(child, parent string) error {
 	category := Node{
 		name: child,
 	}
 	if len(parent) == 0 {
 		root.children = append(root.children, &category)
-		return root
+		return nil
 	}
 
-	for i, child := range root.children {
-		parentNode := findByName(child, parent)
-		if parentNode != nil && len(parentNode.children) == 0 {
-			parentNode.children = append(parentNode.children, &category)
-			root.children[i] = parentNode
-			break
+	childNode := findByName(&root, child)
+	if childNode != nil {
+		return errors.New("Category already exists")
+	}
+
+	parentNode := findByName(&root, parent)
+	if parentNode != nil {
+		parentNode.children = append(parentNode.children, &category)
+	}
+
+	return nil
+}
+
+func getAllChildren(name string) error {
+	node := findByName(&root, name)
+	if node == nil {
+		return errors.New("Category does not exists")
+	}
+
+	if len(node.children) > 0 {
+		log.Println("Children of Category:", name)
+		for _, child := range node.children {
+			log.Println(child.name)
 		}
 	}
 
-	return root
+	return nil
 }
 
 func findByName(parentNode *Node, name string) *Node {
 	queue := make([]*Node, 0)
 	queue = append(queue, parentNode)
+
 	for len(queue) > 0 {
-		nextUp := queue[0]
-		queue = queue[1:]
-		if nextUp.name == name {
-			return nextUp
-		}
-		if len(nextUp.children) > 0 {
-			for _, child := range nextUp.children {
-				queue = append(queue, child)
+		n := len(queue)
+		for n > 0 {
+			nextUp := queue[0]
+			queue = queue[1:]
+			if nextUp.name == name {
+				return nextUp
 			}
+
+			if len(nextUp.children) > 0 {
+				for _, child := range nextUp.children {
+					queue = append(queue, child)
+				}
+			}
+			n--
 		}
 	}
 	return nil
 }
 
 func main() {
-	root = addCategory("a", "")
-	root = addCategory("b", "")
-	root = addCategory("c", "b")
-	log.Println(root.children[1])
+	err := addCategory("a", "")
+	if err != nil {
+		log.Println(err)
+	}
+	err = addCategory("b", "")
+	if err != nil {
+		log.Println(err)
+	}
+	err = addCategory("c", "b")
+	if err != nil {
+		log.Println(err)
+	}
+	err = addCategory("d", "a")
+	if err != nil {
+		log.Println(err)
+	}
+	err = addCategory("e", "a")
+	if err != nil {
+		log.Println(err)
+	}
+	err = addCategory("f", "a")
+	if err != nil {
+		log.Println(err)
+	}
+	err = addCategory("g", "")
+	if err != nil {
+		log.Println(err)
+	}
+	err = getAllChildren("a")
+	if err != nil {
+		log.Println(err)
+	}
+	err = getAllChildren("root")
+	if err != nil {
+		log.Println(err)
+	}
 }
