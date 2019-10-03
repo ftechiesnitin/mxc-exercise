@@ -1,5 +1,16 @@
-# N-ARY Representation in Golang
-N-aray representation in giolang. with following functions for example. It is just a basic example, open for PR's to improve.
+# N-ARY Tree Representation in Golang
+N-ary tree representation in giolang. with following functions for example. It is just a basic example, open for PR's to improve.
+
+```
+                   1
+                 / | \
+                /  |   \
+              2    3     4
+             / \       / | \
+            5    6    7  8  9
+           /   / | \ 
+          10  11 12 13
+```
 
 ### Methods
 ```go
